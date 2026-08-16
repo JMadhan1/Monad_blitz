@@ -335,10 +335,10 @@ ZK is the only option that is **simultaneously**: no trusted party · no reveal 
 ├── contracts/
 │   ├── ZKSpendAuth.sol                 🛡️ registerPolicy · revokePolicy · validationRequest · validationResponse
 │   ├── Groth16Verifier.sol             🧮 snarkjs-generated, BN254 precompiles
-│   ├── Upvote.sol                      🗳️ on-chain interest counter, one vote per address
+│   ├── Upvote.sol                      🗳️ on-chain waitlist counter, one signup per address
 │   └── mocks/MockIdentityRegistry.sol  🆔 ERC-8004 Identity Registry stand-in
 ├── public/                             🎨 static frontend — proofs generated in YOUR browser
-│   ├── index.html                      🏠 landing page (problem, mechanism, live upvote counter)
+│   ├── index.html                      🏠 landing page (problem, mechanism, live waitlist counter)
 │   ├── app.html                        🖥️ the actual 4-step console (connect → commit → spend → agent demo)
 │   ├── docs.html                       📖 full documentation, on-site — not a GitHub redirect
 │   ├── agent/simple-agent.js           🤖 the autonomous demo agent
