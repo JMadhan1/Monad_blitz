@@ -298,33 +298,33 @@ async function runAgent() {
   
   setStage("stage4", "active", "running");
   
-  logLine(agentLog, "🤖 Starting AI Agent decision cycle...", "dim");
+  logLine(agentLog, "Starting agent decision cycle…", "dim");
   logLine(agentLog, "Agent will evaluate 5 opportunities and attempt spends using Blind Cap.", "dim");
-  
+
   const logCallback = (logEntry) => {
-    const status = logEntry.decision === "APPROVED" ? "pass" : 
+    const status = logEntry.decision === "APPROVED" ? "pass" :
                    logEntry.decision === "BLOCKED" ? "block" : "dim";
-    
-    logLine(agentLog, `🎯 ${logEntry.opportunity} ($${logEntry.cost})`, "dim");
+
+    logLine(agentLog, `${logEntry.opportunity} ($${logEntry.cost})`, "dim");
     logLine(agentLog, `   Decision: ${logEntry.decision} — ${logEntry.reasoning}`, status);
-    
+
     if (logEntry.proofGenerated !== undefined) {
       if (logEntry.proofGenerated) {
-        logLine(agentLog, `   ✓ Proof generated in ${logEntry.proofTime}ms`, "pass");
+        logLine(agentLog, `   Proof generated in ${logEntry.proofTime}ms`, "pass");
       } else {
-        logLine(agentLog, `   ✗ No proof exists — exceeds hidden limit`, "block");
+        logLine(agentLog, `   No proof exists — exceeds hidden limit`, "block");
       }
     }
-    
+
     updateAgentStats();
   };
-  
+
   try {
     await agent.runDecisionCycle(5, 1500, logCallback);
-    logLine(agentLog, "🏁 Agent decision cycle complete.", "pass");
-    
+    logLine(agentLog, "Agent decision cycle complete.", "pass");
+
     const stats = agent.getDecisionStats();
-    logLine(agentLog, `📊 Final stats: ${stats.approved} approved, ${stats.blocked} blocked, ${stats.skipped} skipped`, "dim");
+    logLine(agentLog, `Final stats: ${stats.approved} approved, ${stats.blocked} blocked, ${stats.skipped} skipped`, "dim");
     
     setStage("stage4", "done", "completed");
     
@@ -340,7 +340,7 @@ async function runAgent() {
 function stopAgent() {
   if (agent) {
     agent.stop();
-    logLine($("agentLog"), "🛑 Agent stopped by user.", "block");
+    logLine($("agentLog"), "Agent stopped by user.", "block");
     setStage("stage4", "active", "stopped");
     $("runAgentBtn").disabled = false;
     $("stopAgentBtn").disabled = true;

@@ -145,28 +145,21 @@
 
 /* ---- problem/solution boxes ---------------------------------------- */
 .problem-box, .solution-box {
-  padding: 16px;
-  border-radius: 12px;
-  margin: 16px 0;
-  border-left: 4px solid;
-}
-
-.problem-box {
-  background: var(--bad-bg);
-  border-color: var(--bad);
-}
-
-.solution-box {
-  background: var(--good-bg);
-  border-color: var(--good);
+  padding: 14px 16px;
+  border-radius: 10px;
+  margin: 14px 0;
+  border: 1px solid var(--border-soft);
+  background: var(--surface-2);
 }
 
 .problem-title, .solution-title {
-  font-weight: 700;
-  font-size: 14px;
-  margin-bottom: 8px;
+  font-family: "IBM Plex Mono", monospace;
+  font-weight: 500;
+  font-size: 10.5px;
+  margin-bottom: 6px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
 }
 
 .problem-text, .solution-text {
