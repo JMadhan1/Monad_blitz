@@ -14,6 +14,20 @@ const ABI = [
 const $ = (id) => document.getElementById(id);
 let deployment;
 
+/* ---- wallet discovery (EIP-6963, same pattern as app.js) ---------------------------------------- */
+const discoveredWallets = new Map();
+window.addEventListener("eip6963:announceProvider", (event) => {
+  discoveredWallets.set(event.detail.info.uuid, event.detail);
+});
+window.dispatchEvent(new Event("eip6963:requestProvider"));
+
+function getWalletProvider() {
+  const wallets = [...discoveredWallets.values()];
+  if (wallets.length > 0) return wallets[0].provider;
+  if (window.ethereum) return window.ethereum;
+  return null;
+}
+
 async function loadCount() {
   try {
     const res = await fetch("upvote-deployment.json", { cache: "no-store" });
@@ -29,7 +43,8 @@ async function loadCount() {
 
 async function joinWaitlist() {
   const btn = $("waitlistBtn");
-  if (!window.ethereum) {
+  const walletProvider = getWalletProvider();
+  if (!walletProvider) {
     alert("Install a wallet extension (MetaMask, Trust Wallet, etc.) to join the waitlist on-chain.");
     return;
   }
@@ -38,7 +53,7 @@ async function joinWaitlist() {
   const originalText = btn.textContent;
   btn.textContent = "Confirm in wallet…";
   try {
-    await window.ethereum.request({
+    await walletProvider.request({
       method: "wallet_addEthereumChain",
       params: [{
         chainId: "0x279f",
@@ -49,7 +64,7 @@ async function joinWaitlist() {
       }],
     }).catch(() => {});
 
-    const provider = new ethers.BrowserProvider(window.ethereum);
+    const provider = new ethers.BrowserProvider(walletProvider);
     await provider.send("eth_requestAccounts", []);
     const signer = await provider.getSigner();
     const contract = new ethers.Contract(deployment.address, ABI, signer);
