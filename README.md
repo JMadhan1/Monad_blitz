@@ -1,6 +1,8 @@
-# ZK Spend Auth
+# Blind Cap
 
 **An AI agent proves it can afford a payment — without ever revealing what it's allowed to spend.**
+
+*(Product name: Blind Cap. On-chain contract name: `ZKSpendAuth` — verified under that name below.)*
 
 Built at Monad Blitz Bangalore V5, 16 August 2026.
 
