@@ -216,6 +216,22 @@ All three **full-match verified** on Sourcify — source, not just bytecode.
 
 <br/>
 
+<div align="center">
+
+**Monad Mainnet · Chain ID `143`**
+
+| Contract | Address | Source |
+|:--|:--|:--:|
+| 🛡️ **ZKSpendAuth** *(main registry)* | `0x165825Bd33c87c8aE31d60211dE9EE93e8039adE` | [![Verified](https://img.shields.io/badge/✓_verified-00C853?style=flat-square)](https://monadscan.com/address/0x165825Bd33c87c8aE31d60211dE9EE93e8039adE) |
+| 🧮 **Groth16Verifier** | `0x4dE6AF7329E88F08C0560DAf1290a0DF152901E3` | [![Verified](https://img.shields.io/badge/✓_verified-00C853?style=flat-square)](https://monadscan.com/address/0x4dE6AF7329E88F08C0560DAf1290a0DF152901E3) |
+| 🆔 **MockIdentityRegistry** | `0x2274D05C24527D0e4b689b215ddEAfE51B319008` | [![Verified](https://img.shields.io/badge/✓_verified-00C853?style=flat-square)](https://monadscan.com/address/0x2274D05C24527D0e4b689b215ddEAfE51B319008) |
+
+Also deployed and **full-match verified** on mainnet. The live demo above runs on testnet (that's where the funded demo wallet and the actual pitch flow live) — mainnet deployment exists to prove the contracts are real and deployable with real value at stake, not just a testnet-only toy.
+
+</div>
+
+<br/>
+
 ## 🥊 How this beats what already exists
 
 <div align="center">

@@ -15,6 +15,11 @@ module.exports = {
       chainId: 10143,
       accounts: DEPLOYER_KEY ? [DEPLOYER_KEY] : [],
     },
+    monadMainnet: {
+      url: "https://rpc.monad.xyz",
+      chainId: 143,
+      accounts: DEPLOYER_KEY ? [DEPLOYER_KEY] : [],
+    },
   },
   sourcify: {
     enabled: true,
