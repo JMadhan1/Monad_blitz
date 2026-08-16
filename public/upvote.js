@@ -2,6 +2,7 @@ const ABI = [
   "function upvote() external",
   "function totalUpvotes() view returns (uint256)",
   "function hasUpvoted(address) view returns (bool)",
+  "error AlreadyUpvoted()",
 ];
 
 const $ = (id) => document.getElementById(id);
