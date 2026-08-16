@@ -170,7 +170,7 @@ Try to authorize a spend above the committed limit. You can read every byte of o
 
 ## 🚀 Try it — under a minute, zero setup
 
-**🔗 Live demo: https://blind-cap.vercel.app** — nothing to install, just a wallet.
+**🔗 Live demo: https://blindcap.jmadhan.me** — nothing to install, just a wallet.
 
 Or run it locally. Everything is **pre-built and pre-deployed** — no circuit to compile, no contract to deploy, no `.env` to touch:
 
