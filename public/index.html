@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ZK Spend Auth — Monad Blitz Bangalore V5</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="badge">Monad Testnet</div>
+      <h1>ZK Spend Auth</h1>
+      <p class="sub">An AI agent proves a spend is within its policy — <b>without revealing the policy</b> — verified on-chain with a Groth16 proof.</p>
+    </header>
+
+    <section class="panel">
+      <div class="row">
+        <button id="connectBtn">Connect Wallet</button>
+        <span id="account" class="mono"></span>
+      </div>
+      <div class="row" id="contractRow"></div>
+    </section>
+
+    <section class="panel">
+      <h2>1. Commit a hidden spend policy</h2>
+      <p class="hint">Only the <b>hash</b> of the policy goes on-chain. The real limit (1000) stays off-chain.</p>
+      <button id="setupBtn" disabled>Register agent + commit policy</button>
+      <pre id="setupLog" class="log"></pre>
+    </section>
+
+    <section class="panel">
+      <h2>2. Try a spend</h2>
+      <div class="row">
+        <button id="passBtn" disabled>Spend 500 (within hidden limit)</button>
+        <button id="failBtn" disabled>Spend 5000 (over hidden limit)</button>
+      </div>
+      <pre id="spendLog" class="log"></pre>
+    </section>
+
+    <footer>
+      Built live at Monad Blitz Bangalore V5 · <span id="verifiedLink"></span>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/snarkjs@0.7.5/build/snarkjs.min.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

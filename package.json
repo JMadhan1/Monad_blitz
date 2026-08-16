@@ -1,0 +1,22 @@
+{
+  "name": "blitz-blr-v5-zk-agent-auth",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Monad Blitz Bangalore V5 - ZK-gated spend authorization for AI agent payments",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network monadTestnet"
+  },
+  "devDependencies": {
+    "hardhat": "^2.22.0",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0"
+  },
+  "dependencies": {
+    "circomlib": "^2.0.5",
+    "circomlibjs": "^0.1.7",
+    "snarkjs": "^0.7.5",
+    "ethers": "^6.13.0",
+    "dotenv": "^17.4.2"
+  }
+}

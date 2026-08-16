@@ -1,0 +1,9 @@
+node_modules/
+artifacts/
+cache/
+.env
+circom.exe
+circuits/build/*.ptau
+circuits/build/*_0000.zkey
+circuits/build/spend_auth_0000.zkey
+HANDOFF.md
