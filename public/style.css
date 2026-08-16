@@ -398,6 +398,13 @@ code {
   font-size: 12.5px;
   color: var(--ink-faint);
 }
+.btn-pulse {
+  animation: btn-pulse-glow 1.8s ease-in-out infinite;
+}
+@keyframes btn-pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); }
+  50% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--accent) 0%, transparent); }
+}
 
 /* ---- docs page -------------------------------------------------------- */
 .docs-page .landing-hero { border-bottom: 1px solid var(--border-soft); padding-bottom: 32px; }

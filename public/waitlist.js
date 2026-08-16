@@ -34,6 +34,7 @@ async function joinWaitlist() {
     return;
   }
   btn.disabled = true;
+  btn.classList.remove("btn-pulse");
   const originalText = btn.textContent;
   btn.textContent = "Confirm in wallet…";
   try {
@@ -58,13 +59,16 @@ async function joinWaitlist() {
     await tx.wait();
 
     btn.textContent = "You're on the list ✓";
+    btn.classList.remove("btn-pulse");
     await loadCount();
   } catch (err) {
     if (String(err.reason || err.message || "").includes("AlreadyUpvoted")) {
       btn.textContent = "Already on the list ✓";
+      btn.classList.remove("btn-pulse");
     } else {
       btn.textContent = originalText;
       btn.disabled = false;
+      btn.classList.add("btn-pulse");
       alert("Couldn't join the waitlist: " + (err.reason || err.shortMessage || err.message));
     }
   }
