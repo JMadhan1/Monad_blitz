@@ -169,7 +169,7 @@
 
 /* ---- base -------------------------------------------------------- */
 * { box-sizing: border-box; }
-html { color-scheme: light dark; }
+html { color-scheme: light dark; scroll-padding-top: 92px; scroll-behavior: smooth; }
 body {
   margin: 0;
   background: var(--bg);
@@ -209,6 +209,7 @@ code {
 }
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  html { scroll-behavior: auto; }
 }
 
 /* ---- topbar -------------------------------------------------------- */
@@ -332,6 +333,53 @@ code {
 
 .landing-section { margin-bottom: 48px; }
 .landing-steps { max-width: 60ch; }
+
+.contracts-table {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface);
+}
+.contracts-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-soft);
+  flex-wrap: wrap;
+}
+.contracts-row:last-child { border-bottom: none; }
+.contracts-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 3px;
+}
+.contracts-tag {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  font-weight: 500;
+  margin-left: 6px;
+}
+.contracts-addr {
+  font-size: 12px;
+  color: var(--ink-dim);
+  background: none;
+  border: none;
+  padding: 0;
+}
+.contracts-row a {
+  color: var(--accent);
+  font-size: 13px;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.contracts-row a:hover { text-decoration: underline; }
 
 .landing-final-cta {
   text-align: center;
