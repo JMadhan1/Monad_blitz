@@ -181,7 +181,7 @@ npm install
 npx serve public
 ```
 
-Connect MetaMask with a little [testnet MON 🚰](https://faucet.monad.xyz) *(MetaMask will offer to add Monad Testnet automatically)*, then:
+Open the printed local URL — that's the landing page. Click **Launch App** (or go straight to `/app`) to reach the actual console. Connect MetaMask with a little [testnet MON 🚰](https://faucet.monad.xyz) *(MetaMask will offer to add Monad Testnet automatically)*, then:
 
 <div align="center">
 
