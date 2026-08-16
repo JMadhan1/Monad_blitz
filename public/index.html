@@ -4,44 +4,95 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ZK Spend Auth — Monad Blitz Bangalore V5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,450;9..144,550;9..144,650&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="badge">Monad Testnet</div>
-      <h1>ZK Spend Auth</h1>
-      <p class="sub">An AI agent proves a spend is within its policy — <b>without revealing the policy</b> — verified on-chain with a Groth16 proof.</p>
-    </header>
+  <header class="topbar">
+    <div class="wordmark">
+      <span class="wordmark-mark">◆</span>
+      <span>ZK&nbsp;Spend&nbsp;Auth</span>
+    </div>
+    <div class="net-chip">
+      <span class="net-dot" id="netDot"></span>
+      Monad Testnet <span class="net-chip-id">10143</span>
+    </div>
+  </header>
 
-    <section class="panel">
-      <div class="row">
-        <button id="connectBtn">Connect Wallet</button>
-        <span id="account" class="mono"></span>
+  <main class="wrap">
+    <section class="hero">
+      <h1>Prove you can afford it.<br />Reveal nothing.</h1>
+      <p class="hero-sub">An AI agent authorizes its own payment on-chain — a Groth16 proof confirms the request is within its committed limit, and the limit itself never appears in plaintext, anywhere.</p>
+
+      <div class="commitment-diagram" aria-hidden="true">
+        <div class="cd-node"><span class="cd-dot"></span><span class="cd-label">secret limit</span></div>
+        <div class="cd-line"></div>
+        <div class="cd-node"><span class="cd-dot"></span><span class="cd-label">Poseidon hash</span></div>
+        <div class="cd-line"></div>
+        <div class="cd-node"><span class="cd-dot"></span><span class="cd-label">ZK proof</span></div>
+        <div class="cd-line"></div>
+        <div class="cd-node cd-node-final"><span class="cd-dot"></span><span class="cd-label">on-chain ✓</span></div>
       </div>
-      <div class="row" id="contractRow"></div>
     </section>
 
-    <section class="panel">
-      <h2>1. Commit a hidden spend policy</h2>
-      <p class="hint">Only the <b>hash</b> of the policy goes on-chain. The real limit (1000) stays off-chain.</p>
-      <button id="setupBtn" disabled>Register agent + commit policy</button>
-      <pre id="setupLog" class="log"></pre>
-    </section>
-
-    <section class="panel">
-      <h2>2. Try a spend</h2>
-      <div class="row">
-        <button id="passBtn" disabled>Spend 500 (within hidden limit)</button>
-        <button id="failBtn" disabled>Spend 5000 (over hidden limit)</button>
+    <section class="stage" data-state="active" id="stage1">
+      <div class="stage-rail">
+        <span class="stage-num">1</span>
+        <span class="stage-connector"></span>
       </div>
-      <pre id="spendLog" class="log"></pre>
+      <div class="stage-body">
+        <div class="stage-head">
+          <h2>Connect a wallet</h2>
+          <span class="pill" id="stage1Pill">not connected</span>
+        </div>
+        <div class="stage-row">
+          <button id="connectBtn" class="btn btn-primary">Connect Wallet</button>
+          <span id="account" class="mono account-addr"></span>
+        </div>
+        <div class="contract-info" id="contractRow"></div>
+      </div>
     </section>
 
-    <footer>
-      Built live at Monad Blitz Bangalore V5 · <span id="verifiedLink"></span>
-    </footer>
-  </div>
+    <section class="stage" data-state="idle" id="stage2">
+      <div class="stage-rail">
+        <span class="stage-num">2</span>
+        <span class="stage-connector"></span>
+      </div>
+      <div class="stage-body">
+        <div class="stage-head">
+          <h2>Commit a hidden spend policy</h2>
+          <span class="pill" id="stage2Pill">waiting</span>
+        </div>
+        <p class="stage-hint">Only <code>Poseidon(secretKey, maxLimit, owner)</code> goes on-chain. The real limit — <strong>1000</strong> — never leaves this browser.</p>
+        <button id="setupBtn" class="btn btn-primary" disabled>Register agent + commit policy</button>
+        <pre id="setupLog" class="console" data-empty="true"></pre>
+      </div>
+    </section>
+
+    <section class="stage" data-state="idle" id="stage3">
+      <div class="stage-rail">
+        <span class="stage-num">3</span>
+      </div>
+      <div class="stage-body">
+        <div class="stage-head">
+          <h2>Try a spend</h2>
+          <span class="pill" id="stage3Pill">waiting</span>
+        </div>
+        <div class="stage-row">
+          <button id="passBtn" class="btn btn-good" disabled>Spend 500 — within hidden limit</button>
+          <button id="failBtn" class="btn btn-bad" disabled>Spend 5000 — over hidden limit</button>
+        </div>
+        <pre id="spendLog" class="console" data-empty="true"></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>Built live at Monad Blitz Bangalore V5, 16 August 2026</span>
+    <span id="verifiedLink"></span>
+  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/snarkjs@0.7.5/build/snarkjs.min.js"></script>

@@ -1,0 +1,9 @@
+{
+  "network": "monadTestnet",
+  "chainId": "10143",
+  "groth16Verifier": "0x4dE6AF7329E88F08C0560DAf1290a0DF152901E3",
+  "identityRegistry": "0x2274D05C24527D0e4b689b215ddEAfE51B319008",
+  "zkSpendAuth": "0x165825Bd33c87c8aE31d60211dE9EE93e8039adE",
+  "deployer": "0xb2eA43EC4681a21Af81e22fB4531b392D2e24502",
+  "deployedAt": "2026-08-16T06:01:51.377Z"
+}

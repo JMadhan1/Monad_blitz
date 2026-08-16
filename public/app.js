@@ -5,7 +5,7 @@ const MONAD_TESTNET = {
   chainName: "Monad Testnet",
   nativeCurrency: { name: "MON", symbol: "MON", decimals: 18 },
   rpcUrls: ["https://testnet-rpc.monad.xyz/"],
-  blockExplorerUrls: ["https://testnet.monadexplorer.com"],
+  blockExplorerUrls: ["https://testnet.monadvision.com"],
 };
 
 const REGISTRY_ABI = [
@@ -21,22 +21,59 @@ const $ = (id) => document.getElementById(id);
 const AGENT_ID = 1;
 const SECRET_POLICY_KEY = "424242424242";
 const MAX_LIMIT = "1000";
-const EXPLORER = "https://testnet.monadexplorer.com/tx/";
+const EXPLORER = "https://testnet.monadvision.com/tx/";
 
 let provider, signer, poseidon, deployment;
 let committedRoot;
 
-function log(el, msg) {
-  el.textContent += msg + "\n";
+/* ---- console log helpers ---------------------------------------- */
+
+function clearLog(el) {
+  el.innerHTML = "";
+  el.dataset.empty = "true";
 }
+
+function logLine(el, msg, kind) {
+  el.dataset.empty = "false";
+  const line = document.createElement("div");
+  if (kind) line.className = "line-" + kind;
+  line.textContent = msg;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
+function logTx(el, label, hash) {
+  el.dataset.empty = "false";
+  const line = document.createElement("div");
+  line.className = "line-tx";
+  const a = document.createElement("a");
+  a.href = EXPLORER + hash;
+  a.target = "_blank";
+  a.rel = "noopener";
+  a.textContent = `${label} → ${hash.slice(0, 10)}…${hash.slice(-6)}`;
+  line.appendChild(a);
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
+/* ---- stage state ---------------------------------------- */
+
+function setStage(id, state, pillText) {
+  const section = $(id);
+  section.dataset.state = state;
+  const pill = $(id + "Pill");
+  if (pill && pillText) pill.textContent = pillText;
+}
+
+/* ---- deployment + connect ---------------------------------------- */
 
 async function loadDeployment() {
   const res = await fetch("deployment.json", { cache: "no-store" });
   deployment = await res.json();
-  $("contractRow").innerHTML = `
-    <span class="mono small">ZKSpendAuth: ${deployment.zkSpendAuth}</span>
-  `;
-  $("verifiedLink").innerHTML = `<a href="${EXPLORER}${deployment.deployTx || ""}" target="_blank">view deployment</a>`;
+  $("contractRow").innerHTML = `<span class="mono account-addr">ZKSpendAuth <code>${deployment.zkSpendAuth}</code></span>`;
+  if (deployment.deployTx) {
+    $("verifiedLink").innerHTML = `<a href="${EXPLORER}${deployment.deployTx}" target="_blank" rel="noopener">view deployment</a>`;
+  }
 }
 
 async function connect() {
@@ -58,57 +95,64 @@ async function connect() {
   const addr = await signer.getAddress();
   $("account").textContent = addr;
   $("setupBtn").disabled = false;
+  $("netDot").classList.add("live");
+
+  setStage("stage1", "done", "connected");
+  setStage("stage2", "active", "ready");
 
   poseidon = await buildPoseidon();
 }
 
 async function setupPolicy() {
   const setupLog = $("setupLog");
-  setupLog.textContent = "";
+  clearLog(setupLog);
   try {
     const ownerAddr = await signer.getAddress();
 
-    log(setupLog, "Registering agent identity...");
+    logLine(setupLog, "Registering agent identity…", "dim");
     const identity = new ethers.Contract(deployment.identityRegistry, IDENTITY_ABI, signer);
     const tx1 = await identity.register(AGENT_ID, ownerAddr);
     await tx1.wait();
-    log(setupLog, "  tx: " + EXPLORER + tx1.hash);
+    logTx(setupLog, "tx", tx1.hash);
 
     committedRoot = poseidon.F.toString(
       poseidon([SECRET_POLICY_KEY, MAX_LIMIT, BigInt(ownerAddr).toString()])
     );
-    log(setupLog, "Committed policy hash (limit is HIDDEN): " + committedRoot.slice(0, 24) + "...");
+    logLine(setupLog, "Committed policy hash (limit is HIDDEN): " + committedRoot.slice(0, 24) + "…", "dim");
 
     const spendAuth = new ethers.Contract(deployment.zkSpendAuth, REGISTRY_ABI, signer);
     const tx2 = await spendAuth.registerPolicy(AGENT_ID, committedRoot);
     await tx2.wait();
-    log(setupLog, "  tx: " + EXPLORER + tx2.hash);
-    log(setupLog, "\nPolicy committed on-chain. Real limit (1000) never left this browser.");
+    logTx(setupLog, "tx", tx2.hash);
+    logLine(setupLog, "Policy committed on-chain. Real limit (1000) never left this browser.", "pass");
 
     $("passBtn").disabled = false;
     $("failBtn").disabled = false;
+
+    setStage("stage2", "done", "committed");
+    setStage("stage3", "active", "ready");
   } catch (err) {
-    log(setupLog, "ERROR: " + (err.reason || err.message));
+    logLine(setupLog, "ERROR: " + (err.reason || err.message), "block");
   }
 }
 
 async function attemptSpend(amount, targetLogId) {
   const el = $(targetLogId);
-  el.textContent = "";
+  clearLog(el);
   try {
     const ownerAddr = await signer.getAddress();
     const spendAuth = new ethers.Contract(deployment.zkSpendAuth, REGISTRY_ABI, signer);
 
-    log(el, `Requesting on-chain validation for spend of ${amount}...`);
+    logLine(el, `Requesting on-chain validation for spend of ${amount}…`, "dim");
     const reqTx = await spendAuth.validationRequest(AGENT_ID, amount);
     const receipt = await reqTx.wait();
     const event = receipt.logs
       .map((l) => { try { return spendAuth.interface.parseLog(l); } catch { return null; } })
       .find((e) => e && e.name === "ValidationRequested");
     const requestHash = event.args.requestHash;
-    log(el, "  tx: " + EXPLORER + reqTx.hash);
+    logTx(el, "tx", reqTx.hash);
 
-    log(el, "Generating Groth16 proof in this browser...");
+    logLine(el, "Generating Groth16 proof in this browser…", "dim");
     const t0 = performance.now();
     const input = {
       secretPolicyKey: SECRET_POLICY_KEY,
@@ -122,22 +166,22 @@ async function attemptSpend(amount, targetLogId) {
       "circuit/spend_auth.wasm",
       "circuit/spend_auth_final.zkey"
     );
-    log(el, `  proof generated in ${Math.round(performance.now() - t0)}ms`);
+    logLine(el, `Proof generated in ${Math.round(performance.now() - t0)}ms`, "dim");
 
     const calldata = await snarkjs.groth16.exportSolidityCallData(proof, publicSignals);
     const [pA, pB, pC] = JSON.parse(`[${calldata}]`);
 
-    log(el, "Submitting proof on-chain for verification...");
+    logLine(el, "Submitting proof on-chain for verification…", "dim");
     const respTx = await spendAuth.validationResponse(requestHash, pA, pB, pC);
     await respTx.wait();
-    log(el, "  tx: " + EXPLORER + respTx.hash);
-    log(el, "\n✅ PASSED — spend authorized on-chain, limit never revealed.");
+    logTx(el, "tx", respTx.hash);
+    logLine(el, "PASSED — spend authorized on-chain, limit never revealed.", "pass");
   } catch (err) {
     if (String(err.message || "").includes("Assert Failed") || String(err).includes("witness")) {
-      log(el, "\n❌ BLOCKED — no valid proof exists for this amount against the hidden limit.");
-      log(el, "(This never even reaches the chain: the circuit has no satisfying witness.)");
+      logLine(el, "BLOCKED — no valid proof exists for this amount against the hidden limit.", "block");
+      logLine(el, "This never even reaches the chain: the circuit has no satisfying witness.", "dim");
     } else {
-      log(el, "ERROR: " + (err.reason || err.message));
+      logLine(el, "ERROR: " + (err.reason || err.message), "block");
     }
   }
 }

@@ -2,8 +2,11 @@
 
 **A hidden spend limit for AI agent payments, verified on-chain with a Groth16 proof.**
 
-Live demo: `<VERCEL_URL_HERE>`
-Contract on Monad Testnet: `<CONTRACT_ADDRESS_HERE>`
+Live demo: `<VERCEL_URL_HERE>` *(deploying next)*
+Contract on Monad Testnet: [`0x165825Bd33c87c8aE31d60211dE9EE93e8039adE`](https://testnet.monadvision.com/contracts/full_match/10143/0x165825Bd33c87c8aE31d60211dE9EE93e8039adE/) (ZKSpendAuth — verified source)
+
+- Groth16Verifier: [`0x4dE6AF7329E88F08C0560DAf1290a0DF152901E3`](https://testnet.monadvision.com/contracts/full_match/10143/0x4dE6AF7329E88F08C0560DAf1290a0DF152901E3/)
+- MockIdentityRegistry: [`0x2274D05C24527D0e4b689b215ddEAfE51B319008`](https://testnet.monadvision.com/contracts/full_match/10143/0x2274D05C24527D0e4b689b215ddEAfE51B319008/)
 
 ## The problem
 
@@ -30,8 +33,8 @@ An over-limit request can't even produce a proof — the circuit's constraint (`
 Requirements: Node.js 18+, a MetaMask-compatible wallet, some Monad testnet MON ([faucet](https://faucet.monad.xyz)).
 
 ```bash
-git clone <YOUR_REPO_URL>
-cd <REPO_NAME>
+git clone https://github.com/JMadhan1/Monad_blitz.git
+cd Monad_blitz
 npm install
 ```
 
@@ -57,11 +60,15 @@ npx hardhat run scripts/deploy.js --network monadTestnet
 
 This writes `deployment.json` to the project root **and** to `public/deployment.json` (so the frontend picks up the fresh addresses automatically).
 
-### 3. Verify the contract
+### 3. Verify the contracts (via Sourcify, already configured in `hardhat.config.js`)
 
 ```bash
-npx hardhat verify <ZKSpendAuth_ADDRESS> <VERIFIER_ADDRESS> <IDENTITY_REGISTRY_ADDRESS> --network monadTestnet
+npx hardhat verify --network monadTestnet <GROTH16_VERIFIER_ADDRESS>
+npx hardhat verify --network monadTestnet <IDENTITY_REGISTRY_ADDRESS>
+npx hardhat verify --network monadTestnet <ZKSPENDAUTH_ADDRESS> <VERIFIER_ADDRESS> <IDENTITY_REGISTRY_ADDRESS>
 ```
+
+All three are already verified for this deployment — see the links above.
 
 ### 4. Run the frontend
 
