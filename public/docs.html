@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Docs — Blind Cap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,450;9..144,550;9..144,650&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a href="index.html" class="wordmark" style="text-decoration:none; color:inherit;">
+      <span class="wordmark-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none">
+          <path d="M12 2.2 L20.5 5.8 V11.6 C20.5 16.9 17 20.6 12 22 C7 20.6 3.5 16.9 3.5 11.6 V5.8 Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+          <circle cx="12" cy="12" r="2.4" stroke="currentColor" stroke-width="1.5" />
+        </svg>
+      </span>
+      <span>Blind&nbsp;Cap</span>
+    </a>
+    <nav class="topbar-links">
+      <a href="index.html">← Home</a>
+      <a href="app.html">Launch App</a>
+      <a href="https://github.com/JMadhan1/Monad_blitz" target="_blank" rel="noopener" class="topbar-gh" aria-label="View source on GitHub">
+        <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </a>
+    </nav>
+    <div class="net-chip">
+      <span class="net-dot live"></span>
+      Monad Testnet <span class="net-chip-id">10143</span>
+    </div>
+  </header>
+
+  <main class="landing docs-page">
+    <section class="landing-hero" style="text-align:left; margin-bottom:40px;">
+      <div class="hero-badge">Documentation</div>
+      <h1 style="font-size:clamp(28px,4vw,40px);">How Blind Cap works</h1>
+      <p class="hero-sub" style="margin-left:0;">A hidden spend limit for AI agent payments, enforced by a real zero-knowledge proof — not a policy anyone promises to follow.</p>
+    </section>
+
+    <nav class="docs-toc">
+      <a href="#overview">Overview</a>
+      <a href="#mechanism">The mechanism</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#reference">Contract reference</a>
+      <a href="#contracts">Deployed contracts</a>
+      <a href="#run">Run it yourself</a>
+      <a href="#limitations">Limitations</a>
+    </nav>
+
+    <section class="landing-section" id="overview">
+      <p class="explainer-kicker">Overview</p>
+      <p class="docs-p">AI agents already pay for things autonomously on Monad — x402, agentic payment rails, MCP-driven commerce. Nothing checks whether a request is actually <em>authorized</em> before it settles. The obvious fix — write the spend limit on-chain — leaks a business's entire budget to every competitor watching the chain.</p>
+      <p class="docs-p">Blind Cap is the missing piece: an on-chain gate that checks "is this agent allowed to spend this amount?" before a payment settles — without ever revealing the agent's actual spending limit to anyone watching the chain. It's also the missing Validation Registry piece of Monad's ERC-8004 "Trustless Agents" standard — Identity and Reputation registries are live on mainnet, nothing that validates an action before it happens exists yet.</p>
+    </section>
+
+    <section class="landing-section" id="mechanism">
+      <p class="explainer-kicker">The mechanism</p>
+      <ol class="about-steps-list landing-steps">
+        <li><strong>Commit.</strong> The owner picks a limit and commits <code>Poseidon(secretKey, maxLimit, ownerAddr)</code> on-chain. Only the hash is written — the real number never appears on-chain, ever.</li>
+        <li><strong>Prove.</strong> Before paying, the agent generates a Groth16 zero-knowledge proof of exactly one statement: "the requested amount is ≤ the limit I committed to." The limit itself never appears in the proof or its public signals.</li>
+        <li><strong>Verify.</strong> The contract checks the proof (~250k gas, using Monad's native BN254 pairing precompiles) and marks the request <code>Passed</code>, or reverts.</li>
+        <li><strong>Block (the interesting part).</strong> An over-limit request can't even produce a proof — the circuit's constraint (<code>requestedAmount ≤ maxLimit</code>) has no satisfying witness. It's rejected before it ever reaches the chain, by math, not by a rule an admin could change.</li>
+        <li><strong>Revoke, if needed.</strong> The owner can call <code>revokePolicy()</code> to instantly invalidate a committed policy — e.g. after a suspected key leak. No proof can satisfy a revoked policy afterward, regardless of what secret an attacker holds.</li>
+      </ol>
+    </section>
+
+    <section class="landing-section" id="architecture">
+      <p class="explainer-kicker">Architecture</p>
+      <ul class="about-steps-list landing-steps">
+        <li><strong>circuits/spend_auth.circom</strong> — the whole trust model in ~30 lines: a Poseidon commitment check plus a <code>LessEqThan</code> range comparator, compiled with Circom 2.</li>
+        <li><strong>contracts/Groth16Verifier.sol</strong> — snarkjs-generated, verifies proofs on-chain via Monad's native BN254 pairing precompiles.</li>
+        <li><strong>contracts/ZKSpendAuth.sol</strong> — the registry: <code>registerPolicy</code>, <code>revokePolicy</code>, <code>validationRequest</code>, <code>validationResponse</code>.</li>
+        <li><strong>contracts/mocks/MockIdentityRegistry.sol</strong> — a minimal stand-in for a real ERC-8004 Identity Registry (none exists on testnet yet).</li>
+        <li><strong>public/</strong> — a static frontend, zero build step, zero backend. The ZK proof is generated <em>in the visitor's own browser</em> via snarkjs + the compiled <code>.wasm</code>/<code>.zkey</code>, then submitted on-chain directly through their wallet.</li>
+      </ul>
+      <p class="docs-p">No server exists in this system. The "backend" is the blockchain itself — Monad Testnet/Mainnet — which the frontend talks to directly. That's a deliberate architectural choice: nothing to host, nothing that can go down, no server that could log or leak anything.</p>
+    </section>
+
+    <section class="landing-section" id="reference">
+      <p class="explainer-kicker">Contract reference — ZKSpendAuth.sol</p>
+      <div class="contracts-table">
+        <div class="contracts-row">
+          <div><div class="contracts-name">registerPolicy(agentId, committedRoot)</div><div class="contracts-addr">Owner-only. Commits a policy hash for an agent. Overwrites any existing policy.</div></div>
+        </div>
+        <div class="contracts-row">
+          <div><div class="contracts-name">revokePolicy(agentId)</div><div class="contracts-addr">Owner-only. Instantly invalidates the committed policy — no proof can pass afterward.</div></div>
+        </div>
+        <div class="contracts-row">
+          <div><div class="contracts-name">validationRequest(agentId, requestedAmount)</div><div class="contracts-addr">Opens a pending validation request, returns a request hash. Reverts if no policy is committed or the policy is revoked.</div></div>
+        </div>
+        <div class="contracts-row">
+          <div><div class="contracts-name">validationResponse(requestHash, pA, pB, pC)</div><div class="contracts-addr">Submits the Groth16 proof for an open request. Marks it <code>Passed</code> on success, reverts on an invalid proof — no partial state is ever written on failure.</div></div>
+        </div>
+        <div class="contracts-row">
+          <div><div class="contracts-name">getValidationStatus(requestHash) / getPolicy(agentId)</div><div class="contracts-addr">Read-only views.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="landing-section" id="contracts">
+      <p class="explainer-kicker">Deployed contracts</p>
+      <p class="docs-p">Full addresses, verification links, and both testnet and mainnet deployments are on the <a href="index.html#contracts">homepage's Contracts section</a> and in the <a href="https://github.com/JMadhan1/Monad_blitz#readme" target="_blank" rel="noopener">GitHub README</a>.</p>
+    </section>
+
+    <section class="landing-section" id="run">
+      <p class="explainer-kicker">Run it yourself</p>
+      <pre class="console" data-empty="false" style="display:block; max-height:none;">git clone https://github.com/JMadhan1/Monad_blitz.git
+cd Monad_blitz
+npm install
+npx serve public</pre>
+      <p class="docs-p">Everything is pre-built and pre-deployed — no circuit to compile, no contract to deploy, no <code>.env</code> to touch. Open the printed local URL, click <strong>Launch App</strong>, connect a wallet with a little <a href="https://faucet.monad.xyz" target="_blank" rel="noopener">testnet MON</a>, and go.</p>
+    </section>
+
+    <section class="landing-section" id="limitations">
+      <p class="explainer-kicker">Honest limitations</p>
+      <ul class="about-steps-list landing-steps">
+        <li><strong>Per-transaction cap, not a running budget.</strong> No cumulative spend tracking yet — an agent can spend up to the limit repeatedly.</li>
+        <li><strong>One flat limit per agent.</strong> No per-recipient or time-windowed budgets yet — a Merkle-root policy would enable that.</li>
+        <li><strong>Single-contributor trusted setup.</strong> Time-boxed for a one-day build. Production needs a multi-party ceremony or a setup-free system (Plonk/Halo2).</li>
+        <li><strong>In-browser proving (~1–2s).</strong> Fine for a demo, too slow at high agent throughput — server-side or cached proving would fix that.</li>
+        <li><strong>MockIdentityRegistry stands in</strong> for a real ERC-8004 Identity Registry, since none exists on testnet yet.</li>
+      </ul>
+    </section>
+
+    <section class="landing-final-cta">
+      <a href="app.html" class="btn btn-primary btn-lg">Launch App →</a>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>Built live at Monad Blitz Bangalore V5, 16 August 2026</span>
+    <span class="foot-links">
+      <a href="https://github.com/JMadhan1/Monad_blitz" target="_blank" rel="noopener">GitHub</a>
+      <a href="index.html#contracts">Contracts</a>
+      <a href="https://faucet.monad.xyz" target="_blank" rel="noopener">Faucet</a>
+    </span>
+  </footer>
+</body>
+</html>
