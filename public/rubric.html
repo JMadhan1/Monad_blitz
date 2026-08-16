@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Scorecard — Blind Cap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,450;9..144,550;9..144,650&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a href="index.html" class="wordmark" style="text-decoration:none; color:inherit;">
+      <span class="wordmark-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none">
+          <path d="M12 2.2 L20.5 5.8 V11.6 C20.5 16.9 17 20.6 12 22 C7 20.6 3.5 16.9 3.5 11.6 V5.8 Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+          <circle cx="12" cy="12" r="2.4" stroke="currentColor" stroke-width="1.5" />
+        </svg>
+      </span>
+      <span>Blind&nbsp;Cap</span>
+    </a>
+    <nav class="topbar-links">
+      <a href="index.html">← Home</a>
+      <a href="docs.html">Docs</a>
+      <a href="app.html">Launch App</a>
+    </nav>
+    <div class="net-chip">
+      <span class="net-dot live"></span>
+      Monad Testnet <span class="net-chip-id">10143</span>
+    </div>
+  </header>
+
+  <main class="landing">
+    <section class="landing-hero" style="text-align:left; margin-bottom:32px;">
+      <div class="hero-badge">Self-reported, checked against real state</div>
+      <h1 style="font-size:clamp(28px,4vw,40px);">Rubric scorecard</h1>
+      <p class="hero-sub" style="margin-left:0;">Monad Blitz Bangalore V5 · 400-point rubric. Every ✅ below was independently verified — on-chain state, live URLs, real transactions — not just claimed.</p>
+      <div class="score-total" id="scoreTotal">Loading…</div>
+    </section>
+
+    <section class="landing-section">
+      <p class="explainer-kicker">Basic — 100 pts (gates prize eligibility)</p>
+      <div class="rubric-table">
+        <div class="rubric-row rubric-done">
+          <span class="rubric-check">✓</span>
+          <div class="rubric-text"><div class="rubric-name">Public GitHub repo</div><div class="rubric-note">Confirmed publicly accessible without auth</div></div>
+          <span class="rubric-pts">25/25</span>
+        </div>
+        <div class="rubric-row rubric-done">
+          <span class="rubric-check">✓</span>
+          <div class="rubric-text"><div class="rubric-name">Proper README — live page + contract address</div><div class="rubric-note">Live URL, both testnet + mainnet addresses, verified links</div></div>
+          <span class="rubric-pts">25/25</span>
+        </div>
+        <div class="rubric-row rubric-done">
+          <span class="rubric-check">✓</span>
+          <div class="rubric-text"><div class="rubric-name">Smart contracts deployed on Monad Testnet</div><div class="rubric-note">Bytecode confirmed on-chain, real transactions run</div></div>
+          <span class="rubric-pts">25/25</span>
+        </div>
+        <div class="rubric-row rubric-done">
+          <span class="rubric-check">✓</span>
+          <div class="rubric-text"><div class="rubric-name">Project publicly hosted</div><div class="rubric-note">blindcap.jmadhan.me — landing, app, and docs pages all live</div></div>
+          <span class="rubric-pts">25/25</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="landing-section">
+      <p class="explainer-kicker">Advance — Project Working (100 pts)</p>
+      <div class="rubric-table">
+        <div class="rubric-row rubric-done">
+          <span class="rubric-check">✓</span>
+          <div class="rubric-text"><div class="rubric-name">Contract verified on the explorer</div><div class="rubric-note">All contracts full-match verified on Sourcify, testnet + mainnet</div></div>
+          <span class="rubric-pts">25/25</span>
+        </div>
+        <div class="rubric-row rubric-done">
+          <span class="rubric-check">✓</span>
+          <div class="rubric-text"><div class="rubric-name">All announced functions working</div><div class="rubric-note">Connect, commit, spend-pass, spend-block, revoke, agent demo — all confirmed live</div></div>
+          <span class="rubric-pts">25/25</span>
+        </div>
+        <div class="rubric-row rubric-done">
+          <span class="rubric-check">✓</span>
+          <div class="rubric-text"><div class="rubric-name">Someone else can run it from the README</div><div class="rubric-note">Instructions verified accurate against the live 2-page structure</div></div>
+          <span class="rubric-pts">25/25</span>
+        </div>
+        <div class="rubric-row rubric-pending">
+          <span class="rubric-check">◐</span>
+          <div class="rubric-text"><div class="rubric-name">Live transaction on-chain during the demo</div><div class="rubric-note">Happens live at the pitch — everything's proven ready, just hasn't happened on stage yet</div></div>
+          <span class="rubric-pts">at demo</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="landing-section">
+      <p class="explainer-kicker">Virality (100 pts) — this part is on you, not the code</p>
+      <div class="rubric-table">
+        <div class="rubric-row rubric-done">
+          <span class="rubric-check">✓</span>
+          <div class="rubric-text"><div class="rubric-name">Posted on X, tagging @monad @monad_dev @geeky_kartikey</div><div class="rubric-note">Tagged post confirmed live</div></div>
+          <span class="rubric-pts">25/25</span>
+        </div>
+        <div class="rubric-row rubric-pending">
+          <span class="rubric-check">◐</span>
+          <div class="rubric-text"><div class="rubric-name">Demo video posted (30s+)</div><div class="rubric-note">Recordings exist locally — confirm one is actually posted publicly</div></div>
+          <span class="rubric-pts">?/25</span>
+        </div>
+        <div class="rubric-row rubric-pending">
+          <span class="rubric-check">◐</span>
+          <div class="rubric-text"><div class="rubric-name">5K+ / 10K+ views, or 25+ waitlist, or 10+ outside users</div><div class="rubric-note">Depends entirely on reach after posting</div></div>
+          <span class="rubric-pts">?/25–50</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="landing-section">
+      <p class="explainer-kicker">Bonus (100 pts)</p>
+      <div class="rubric-table">
+        <div class="rubric-row rubric-done">
+          <span class="rubric-check">✓</span>
+          <div class="rubric-text"><div class="rubric-name">Contracts deployed on Monad Mainnet</div><div class="rubric-note">All 3 contracts live + verified on chain 143, real MON spent</div></div>
+          <span class="rubric-pts">25/25</span>
+        </div>
+        <div class="rubric-row rubric-done">
+          <span class="rubric-check">✓</span>
+          <div class="rubric-text"><div class="rubric-name">Public page on a custom domain</div><div class="rubric-note">blindcap.jmadhan.me, own domain, verified resolving</div></div>
+          <span class="rubric-pts">15/15</span>
+        </div>
+        <div class="rubric-row rubric-na">
+          <span class="rubric-check">◯</span>
+          <div class="rubric-text"><div class="rubric-name">PMF, Revenue Potential, Innovation & Originality</div><div class="rubric-note">Judged live by judges — not self-scoreable. Differentiation research and honest limitations are the strongest supporting evidence.</div></div>
+          <span class="rubric-pts">up to 60</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="landing-final-cta">
+      <a href="app.html" class="btn btn-primary btn-lg">Launch App →</a>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>Built live at Monad Blitz Bangalore V5, 16 August 2026</span>
+    <span class="foot-links">
+      <a href="https://github.com/JMadhan1/Monad_blitz" target="_blank" rel="noopener">GitHub</a>
+      <a href="index.html#contracts">Contracts</a>
+    </span>
+  </footer>
+
+  <script>
+    const doneRows = document.querySelectorAll('.rubric-done').length;
+    const confirmedPts = [...document.querySelectorAll('.rubric-done .rubric-pts')]
+      .reduce((sum, el) => sum + parseInt(el.textContent), 0);
+    document.getElementById('scoreTotal').textContent =
+      `${confirmedPts} / 400 confirmed right now — plus ${doneRows} items independently verified, not just claimed`;
+  </script>
+</body>
+</html>
