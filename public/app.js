@@ -27,12 +27,12 @@ const IDENTITY_ABI = ["function register(uint256 agentId, address owner) externa
 const $ = (id) => document.getElementById(id);
 const AGENT_ID = 1;
 const SECRET_POLICY_KEY = "424242424242";
-const MAX_LIMIT = "1000";
 const EXPLORER = "https://testnet.monadvision.com/tx/";
 
 let provider, signer, poseidon, deployment;
 let committedRoot;
 let agent;
+let MAX_LIMIT = "1000";
 
 /* ---- multi-wallet discovery (EIP-6963) ---------------------------------------- */
 
@@ -194,10 +194,19 @@ async function connect() {
   poseidon = await buildPoseidon();
 }
 
+let withinAmount = 500;
+let overAmount = 5000;
+
 async function setupPolicy() {
   const setupLog = $("setupLog");
   clearLog(setupLog);
   try {
+    const limitInput = $("limitInput");
+    const chosenLimit = Math.max(1, parseInt(limitInput.value, 10) || 1000);
+    MAX_LIMIT = String(chosenLimit);
+    withinAmount = Math.max(1, Math.floor(chosenLimit / 2));
+    overAmount = chosenLimit * 5;
+
     const ownerAddr = await signer.getAddress();
 
     logLine(setupLog, "Registering agent identity…", "dim");
@@ -215,16 +224,19 @@ async function setupPolicy() {
     const tx2 = await spendAuth.registerPolicy(AGENT_ID, committedRoot);
     await tx2.wait();
     logTx(setupLog, "tx", tx2.hash);
-    logLine(setupLog, "Policy committed on-chain. Real limit (1000) never left this browser.", "pass");
+    logLine(setupLog, `Policy committed on-chain. Real limit (${chosenLimit}) never left this browser.`, "pass");
 
+    $("passBtn").textContent = `Try ${withinAmount} MON (within limit)`;
+    $("failBtn").textContent = `Try ${overAmount} MON (over limit)`;
     $("passBtn").disabled = false;
     $("failBtn").disabled = false;
     $("runAgentBtn").disabled = false;
+    limitInput.disabled = true;
 
     setStage("stage2", "done", "committed");
     setStage("stage3", "active", "ready");
     setStage("stage4", "active", "ready");
-    
+
     // Initialize agent
     agent = new BlindCapAgent(poseidon, committedRoot, SECRET_POLICY_KEY, MAX_LIMIT, signer, deployment);
   } catch (err) {
@@ -284,8 +296,8 @@ async function attemptSpend(amount, targetLogId) {
 
 $("connectBtn").addEventListener("click", connect);
 $("setupBtn").addEventListener("click", setupPolicy);
-$("passBtn").addEventListener("click", () => attemptSpend(500, "spendLog"));
-$("failBtn").addEventListener("click", () => attemptSpend(5000, "spendLog"));
+$("passBtn").addEventListener("click", () => attemptSpend(withinAmount, "spendLog"));
+$("failBtn").addEventListener("click", () => attemptSpend(overAmount, "spendLog"));
 
 /* ---- AI Agent functions ---------------------------------------- */
 

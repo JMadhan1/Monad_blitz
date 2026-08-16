@@ -627,6 +627,32 @@ code {
   line-height: 1.55;
 }
 
+.limit-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.limit-input-row label {
+  font-size: 12.5px;
+  color: var(--ink-dim);
+  font-weight: 500;
+}
+.limit-input {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  width: 140px;
+  transition: border-color 0.15s ease;
+}
+.limit-input:focus { outline: none; border-color: var(--accent); }
+.limit-input:disabled { opacity: 0.6; cursor: not-allowed; }
+
 .stage-row {
   display: flex;
   align-items: center;

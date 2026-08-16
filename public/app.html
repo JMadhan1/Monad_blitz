@@ -65,7 +65,11 @@
           <span class="pill" id="stage2Pill">waiting</span>
         </div>
         <div class="console-step-body">
-          <p class="stage-hint">Set a spending limit (we'll use 1000 MON as example). Only a <strong>hash</strong> of your limit goes on-chain — your actual limit stays completely private in your browser.</p>
+          <p class="stage-hint">Pick your own spending limit. Only a <strong>hash</strong> of it goes on-chain — the real number stays completely private in your browser, never sent anywhere.</p>
+          <div class="limit-input-row">
+            <label for="limitInput">Hidden limit (MON)</label>
+            <input type="number" id="limitInput" class="limit-input" value="1000" min="1" step="1" />
+          </div>
           <button id="setupBtn" class="btn btn-primary" disabled>Register Agent + Hide My Limit</button>
           <pre id="setupLog" class="console" data-empty="true"></pre>
         </div>
@@ -80,10 +84,10 @@
           <span class="pill" id="stage3Pill">waiting</span>
         </div>
         <div class="console-step-body">
-          <p class="stage-hint">Try spending within your hidden limit (500 MON) and over it (5000 MON). Watch how ZK proofs are generated for valid requests, while over-limit requests get blocked mathematically.</p>
+          <p class="stage-hint">Try spending within your hidden limit and over it. Watch how ZK proofs are generated for valid requests, while over-limit requests get blocked mathematically.</p>
           <div class="stage-row">
-            <button id="passBtn" class="btn btn-good" disabled>Try 500 MON (within limit)</button>
-            <button id="failBtn" class="btn btn-bad" disabled>Try 5000 MON (over limit)</button>
+            <button id="passBtn" class="btn btn-good" disabled>Try — (within limit)</button>
+            <button id="failBtn" class="btn btn-bad" disabled>Try — (over limit)</button>
           </div>
           <pre id="spendLog" class="console" data-empty="true"></pre>
         </div>
