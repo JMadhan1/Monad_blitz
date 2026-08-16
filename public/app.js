@@ -1,5 +1,6 @@
 import { buildPoseidon } from "https://cdn.jsdelivr.net/npm/circomlibjs@0.1.7/+esm";
 import { EthereumProvider } from "https://esm.sh/@walletconnect/ethereum-provider@2";
+import BlindCapAgent from "../agent/simple-agent.js";
 
 // Get a free project ID at https://dashboard.reown.com — required for the
 // mobile "scan to connect" wallet option. Browser-extension wallets
@@ -31,6 +32,7 @@ const EXPLORER = "https://testnet.monadvision.com/tx/";
 
 let provider, signer, poseidon, deployment;
 let committedRoot;
+let agent;
 
 /* ---- multi-wallet discovery (EIP-6963) ---------------------------------------- */
 
@@ -217,9 +219,14 @@ async function setupPolicy() {
 
     $("passBtn").disabled = false;
     $("failBtn").disabled = false;
+    $("runAgentBtn").disabled = false;
 
     setStage("stage2", "done", "committed");
     setStage("stage3", "active", "ready");
+    setStage("stage4", "active", "ready");
+    
+    // Initialize agent
+    agent = new BlindCapAgent(poseidon, committedRoot, SECRET_POLICY_KEY, MAX_LIMIT, signer, deployment);
   } catch (err) {
     logLine(setupLog, "ERROR: " + (err.reason || err.message), "block");
   }
@@ -279,5 +286,78 @@ $("connectBtn").addEventListener("click", connect);
 $("setupBtn").addEventListener("click", setupPolicy);
 $("passBtn").addEventListener("click", () => attemptSpend(500, "spendLog"));
 $("failBtn").addEventListener("click", () => attemptSpend(5000, "spendLog"));
+
+/* ---- AI Agent functions ---------------------------------------- */
+
+async function runAgent() {
+  const agentLog = $("agentLog");
+  clearLog(agentLog);
+  $("runAgentBtn").disabled = true;
+  $("stopAgentBtn").disabled = false;
+  $("agentStats").style.display = "flex";
+  
+  setStage("stage4", "active", "running");
+  
+  logLine(agentLog, "🤖 Starting AI Agent decision cycle...", "dim");
+  logLine(agentLog, "Agent will evaluate 5 opportunities and attempt spends using Blind Cap.", "dim");
+  
+  const logCallback = (logEntry) => {
+    const status = logEntry.decision === "APPROVED" ? "pass" : 
+                   logEntry.decision === "BLOCKED" ? "block" : "dim";
+    
+    logLine(agentLog, `🎯 ${logEntry.opportunity} ($${logEntry.cost})`, "dim");
+    logLine(agentLog, `   Decision: ${logEntry.decision} — ${logEntry.reasoning}`, status);
+    
+    if (logEntry.proofGenerated !== undefined) {
+      if (logEntry.proofGenerated) {
+        logLine(agentLog, `   ✓ Proof generated in ${logEntry.proofTime}ms`, "pass");
+      } else {
+        logLine(agentLog, `   ✗ No proof exists — exceeds hidden limit`, "block");
+      }
+    }
+    
+    updateAgentStats();
+  };
+  
+  try {
+    await agent.runDecisionCycle(5, 1500, logCallback);
+    logLine(agentLog, "🏁 Agent decision cycle complete.", "pass");
+    
+    const stats = agent.getDecisionStats();
+    logLine(agentLog, `📊 Final stats: ${stats.approved} approved, ${stats.blocked} blocked, ${stats.skipped} skipped`, "dim");
+    
+    setStage("stage4", "done", "completed");
+    
+  } catch (err) {
+    logLine(agentLog, "ERROR: " + (err.reason || err.message), "block");
+    setStage("stage4", "active", "error");
+  }
+  
+  $("runAgentBtn").disabled = false;
+  $("stopAgentBtn").disabled = true;
+}
+
+function stopAgent() {
+  if (agent) {
+    agent.stop();
+    logLine($("agentLog"), "🛑 Agent stopped by user.", "block");
+    setStage("stage4", "active", "stopped");
+    $("runAgentBtn").disabled = false;
+    $("stopAgentBtn").disabled = true;
+  }
+}
+
+function updateAgentStats() {
+  if (!agent) return;
+  
+  const stats = agent.getDecisionStats();
+  $("statTotal").textContent = stats.total;
+  $("statApproved").textContent = stats.approved;
+  $("statBlocked").textContent = stats.blocked;
+  $("statSkipped").textContent = stats.skipped;
+}
+
+$("runAgentBtn").addEventListener("click", runAgent);
+$("stopAgentBtn").addEventListener("click", stopAgent);
 
 loadDeployment();

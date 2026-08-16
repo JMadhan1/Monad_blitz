@@ -48,21 +48,134 @@
   --surface: #221d15;
   --surface-2: #292219;
   --ink: #f1e9db;
-  --ink-dim: #a99d87;
-  --ink-faint: #6f6553;
-  --border: #372f22;
-  --border-soft: #2c2519;
-  --accent: #e28a5f;
-  --accent-deep: #eda07c;
-  --accent-ink: #201509;
-  --accent-wash: #3a2a1d;
-  --good: #8ebb92;
-  --good-bg: #21301f;
-  --bad: #e0836f;
-  --bad-bg: #362019;
-  --focus: #e28a5f;
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 12px 28px -14px rgba(0, 0, 0, 0.55);
 }
+
+/* ---- agent stats ---------------------------------------------------- */
+.agent-stats {
+  display: flex;
+  gap: 16px;
+  margin: 12px 0;
+  padding: 12px;
+  background: var(--surface-2);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-dim);
+  font-weight: 600;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.stat-good {
+  color: var(--good);
+}
+
+.stat-bad {
+  color: var(--bad);
+}
+
+.stat-dim {
+  color: var(--ink-dim);
+}
+
+/* ---- hero section ---------------------------------------------------- */
+.hero-section {
+  margin-bottom: 32px;
+}
+
+.hero-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  background: var(--accent-wash);
+  color: var(--accent);
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 24px;
+  margin-top: 24px;
+  padding: 20px;
+  background: var(--surface-2);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.hero-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hero-stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.hero-stat-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink-dim);
+  font-weight: 600;
+}
+
+/* ---- problem/solution boxes ---------------------------------------- */
+.problem-box, .solution-box {
+  padding: 16px;
+  border-radius: 12px;
+  margin: 16px 0;
+  border-left: 4px solid;
+}
+
+.problem-box {
+  background: var(--bad-bg);
+  border-color: var(--bad);
+}
+
+.solution-box {
+  background: var(--good-bg);
+  border-color: var(--good);
+}
+
+.problem-title, .solution-title {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.problem-text, .solution-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-dim);
+}
+
+
 
 /* ---- base -------------------------------------------------------- */
 * { box-sizing: border-box; }

@@ -36,36 +36,64 @@
 
   <main class="app-shell">
     <aside class="about-pane">
-      <h1>Prove you can afford it.<br />Reveal nothing.</h1>
-      <p class="hero-sub">AI agents already pay autonomously on Monad — but nothing checks whether a request is actually authorized before it settles. Put the limit on-chain in plaintext and you leak the whole budget to anyone watching. This proves a payment is authorized without ever revealing what the limit is.</p>
+      <div class="hero-section">
+        <div class="hero-badge">Built at Monad Blitz Bangalore V5</div>
+        <h1>🕶️ Blind Cap</h1>
+        <p class="hero-sub">Your AI agent proves it can afford a payment — without ever revealing what it's allowed to spend.</p>
+        
+        <div class="problem-box">
+          <div class="problem-title">❌ The Problem</div>
+          <div class="problem-text">Every AI spend limit writes the cap on-chain in plain text. Competitors read your budget and price accordingly. Your budget becomes their price floor.</div>
+        </div>
+
+        <div class="solution-box">
+          <div class="solution-title">✅ The Solution</div>
+          <div class="solution-text">Use zero-knowledge proofs to hide the limit while still enforcing it mathematically. Over-limit requests literally can't be attempted — the proof doesn't exist.</div>
+        </div>
+        
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-value">ZK</div>
+            <div class="hero-stat-label">Zero-Knowledge</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value">~250k</div>
+            <div class="hero-stat-label">Gas Cost</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value">0</div>
+            <div class="hero-stat-label">Limit Revealed</div>
+          </div>
+        </div>
+      </div>
 
       <div class="ledger-card" aria-hidden="true">
-        <div class="ledger-head"><span class="ledger-dot"></span>live proof preview</div>
+        <div class="ledger-head"><span class="ledger-dot"></span>What happens on-chain</div>
         <div class="ledger-row">
-          <span class="ledger-label">policy commitment</span>
-          <span class="ledger-value">0x8f2a…c91b</span>
+          <span class="ledger-label">Your hidden limit</span>
+          <span class="ledger-value ledger-redacted">████████</span>
         </div>
         <div class="ledger-row">
-          <span class="ledger-label">requested amount</span>
-          <span class="ledger-value">500</span>
+          <span class="ledger-label">What gets written</span>
+          <span class="ledger-value">0x8f2a…c91b (hash only)</span>
         </div>
         <div class="ledger-row">
-          <span class="ledger-label">hidden limit</span>
-          <span class="ledger-value ledger-redacted">██████</span>
+          <span class="ledger-label">Agent requests</span>
+          <span class="ledger-value">500 MON</span>
         </div>
         <div class="ledger-divider"></div>
         <div class="ledger-row ledger-result">
-          <span class="ledger-label">proof</span>
-          <span class="ledger-value ledger-pass">✓ verified on-chain</span>
+          <span class="ledger-label">Contract checks</span>
+          <span class="ledger-value ledger-pass">✓ Proof valid → Payment allowed</span>
         </div>
       </div>
 
       <div class="about-steps" id="how-it-works">
-        <p class="explainer-kicker">How it works</p>
+        <p class="explainer-kicker">How it works in 3 steps</p>
         <ol class="about-steps-list">
-          <li><strong>Commit.</strong> Owner commits <code>Poseidon(secretKey, maxLimit, owner)</code> on-chain — only the hash is written.</li>
-          <li><strong>Prove.</strong> The agent generates a Groth16 proof that the request is within the hidden limit.</li>
-          <li><strong>Verify or block.</strong> The contract checks the proof. An over-limit request can't even produce one — it never reaches the chain.</li>
+          <li><strong>🔒 Commit your limit.</strong> We hash your secret limit + key. Only the hash goes on-chain. Your real limit stays private.</li>
+          <li><strong>🧮 Agent proves it can pay.</strong> AI generates a mathematical proof that the request is within your hidden limit — without revealing the limit.</li>
+          <li><strong>⚡ Contract verifies or blocks.</strong> Smart contract checks the proof. Over-limit requests can't even produce a proof — they're blocked by math.</li>
         </ol>
       </div>
     </aside>
@@ -75,10 +103,11 @@
         <div class="console-step" data-state="active" id="stage1">
           <div class="console-step-head">
             <span class="step-badge">1</span>
-            <h2>Connect a wallet</h2>
+            <h2>🔗 Connect your wallet</h2>
             <span class="pill" id="stage1Pill">not connected</span>
           </div>
           <div class="console-step-body">
+            <p class="stage-hint">Connect your wallet to Monad Testnet to start using Blind Cap. This will be used to register your agent and commit your hidden spending policy.</p>
             <div class="stage-row">
               <button id="connectBtn" class="btn btn-primary">Connect Wallet</button>
               <span id="account" class="mono account-addr"></span>
@@ -92,12 +121,12 @@
         <div class="console-step" data-state="idle" id="stage2">
           <div class="console-step-head">
             <span class="step-badge">2</span>
-            <h2>Commit a hidden spend policy</h2>
+            <h2>🔒 Set your hidden spending limit</h2>
             <span class="pill" id="stage2Pill">waiting</span>
           </div>
           <div class="console-step-body">
-            <p class="stage-hint">Only <code>Poseidon(secretKey, maxLimit, owner)</code> goes on-chain. The real limit — <strong>1000</strong> — never leaves this browser.</p>
-            <button id="setupBtn" class="btn btn-primary" disabled>Register agent + commit policy</button>
+            <p class="stage-hint">Set a spending limit (we'll use 1000 MON as example). Only a <strong>hash</strong> of your limit goes on-chain — your actual limit stays completely private in your browser.</p>
+            <button id="setupBtn" class="btn btn-primary" disabled>Register Agent + Hide My Limit</button>
             <pre id="setupLog" class="console" data-empty="true"></pre>
           </div>
         </div>
@@ -107,15 +136,52 @@
         <div class="console-step" data-state="idle" id="stage3">
           <div class="console-step-head">
             <span class="step-badge">3</span>
-            <h2>Try a spend</h2>
+            <h2>🧪 Test the system manually</h2>
             <span class="pill" id="stage3Pill">waiting</span>
           </div>
           <div class="console-step-body">
+            <p class="stage-hint">Try spending within your hidden limit (500 MON) and over it (5000 MON). Watch how ZK proofs are generated for valid requests, while over-limit requests get blocked mathematically.</p>
             <div class="stage-row">
-              <button id="passBtn" class="btn btn-good" disabled>Spend 500 — within hidden limit</button>
-              <button id="failBtn" class="btn btn-bad" disabled>Spend 5000 — over hidden limit</button>
+              <button id="passBtn" class="btn btn-good" disabled>✅ Try 500 MON (within limit)</button>
+              <button id="failBtn" class="btn btn-bad" disabled>❌ Try 5000 MON (over limit)</button>
             </div>
             <pre id="spendLog" class="console" data-empty="true"></pre>
+          </div>
+        </div>
+
+        <div class="console-divider"></div>
+
+        <div class="console-step" data-state="idle" id="stage4">
+          <div class="console-step-head">
+            <span class="step-badge">4</span>
+            <h2>🤖 Watch AI Agent use Blind Cap</h2>
+            <span class="pill" id="stage4Pill">waiting</span>
+          </div>
+          <div class="console-step-body">
+            <p class="stage-hint">See an AI agent make autonomous spending decisions. It evaluates opportunities, generates ZK proofs for valid spends, and gets mathematically blocked when exceeding your hidden limit.</p>
+            <div class="stage-row">
+              <button id="runAgentBtn" class="btn btn-primary" disabled>▶️ Run AI Agent Demo</button>
+              <button id="stopAgentBtn" class="btn btn-bad" disabled>⏹️ Stop</button>
+            </div>
+            <div class="agent-stats" id="agentStats" style="display: none;">
+              <div class="stat-item">
+                <span class="stat-label">Decisions Made:</span>
+                <span class="stat-value" id="statTotal">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">✅ Approved:</span>
+                <span class="stat-value stat-good" id="statApproved">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">🚫 Blocked:</span>
+                <span class="stat-value stat-bad" id="statBlocked">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">⏭️ Skipped:</span>
+                <span class="stat-value stat-dim" id="statSkipped">0</span>
+              </div>
+            </div>
+            <pre id="agentLog" class="console" data-empty="true"></pre>
           </div>
         </div>
       </div>
