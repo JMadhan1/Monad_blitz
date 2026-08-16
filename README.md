@@ -22,6 +22,8 @@
 
 <sub>Product name: **Blind Cap** · on-chain contract name: `ZKSpendAuth` — verified under that name below.</sub>
 
+**[Live Demo](https://blindcap.jmadhan.me) · [Launch App](https://blindcap.jmadhan.me/app) · [Docs](https://blindcap.jmadhan.me/docs) · [Contracts](https://blindcap.jmadhan.me/#contracts)**
+
 </div>
 
 ---
@@ -187,9 +189,10 @@ Open the printed local URL — that's the landing page. Click **Launch App** (or
 
 | | Click | What actually happens |
 |:--:|:--|:--|
-| 1️⃣ | **Register agent + commit policy** | Commits `Poseidon(secretKey, 1000, yourAddress)`. The `1000` never leaves your browser. |
-| 2️⃣ | **Spend 500** — within hidden limit | Real proof generated in-browser, verified on-chain, live. ✅ **Passes** |
-| 3️⃣ | **Spend 5000** — over hidden limit | No proof can be generated. ⛔ **Blocked before it touches the chain** |
+| 1️⃣ | **Type your own limit, then Register Agent + Hide My Limit** | Commits `Poseidon(secretKey, yourLimit, yourAddress)`. Whatever number you typed never leaves your browser. |
+| 2️⃣ | **Try — (within limit)** | Amount auto-scales to half your chosen limit. Real proof generated in-browser, verified on-chain, live. ✅ **Passes** |
+| 3️⃣ | **Try — (over limit)** | Amount auto-scales to 5× your chosen limit. No proof can be generated. ⛔ **Blocked before it touches the chain** |
+| 4️⃣ | **Run Agent Demo** | An autonomous agent makes its own spend decisions against your hidden limit — no clicking required. |
 
 </div>
 
@@ -332,14 +335,20 @@ ZK is the only option that is **simultaneously**: no trusted party · no reveal 
 ├── contracts/
 │   ├── ZKSpendAuth.sol                 🛡️ registerPolicy · revokePolicy · validationRequest · validationResponse
 │   ├── Groth16Verifier.sol             🧮 snarkjs-generated, BN254 precompiles
+│   ├── Upvote.sol                      🗳️ on-chain interest counter, one vote per address
 │   └── mocks/MockIdentityRegistry.sol  🆔 ERC-8004 Identity Registry stand-in
 ├── public/                             🎨 static frontend — proofs generated in YOUR browser
+│   ├── index.html                      🏠 landing page (problem, mechanism, live upvote counter)
+│   ├── app.html                        🖥️ the actual 4-step console (connect → commit → spend → agent demo)
+│   ├── docs.html                       📖 full documentation, on-site — not a GitHub redirect
+│   ├── agent/simple-agent.js           🤖 the autonomous demo agent
 │   └── vercel.json                     ▲ zero-build static deploy config (deploy root is public/)
-└── test/ZKSpendAuth.test.js            ✅ valid spend passes · over-limit can't produce a witness · revocation blocks validation
+├── scripts/                            deploy.js · deploy-mainnet.js · deploy-upvote.js · redeploy-registry.js
+└── test/                               ✅ ZKSpendAuth.test.js + Upvote.test.js
 ```
 
 ```bash
-npx hardhat test   # 3 passing
+npx hardhat test   # 4 passing
 ```
 
 <br/>
