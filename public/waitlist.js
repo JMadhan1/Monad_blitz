@@ -1,3 +1,9 @@
+// Uses the same on-chain counter contract as before (one signup per
+// address) - reframed here as a waitlist rather than an upvote. The
+// deployed contract's function is still named upvote()/totalUpvotes()
+// on-chain (already verified under those names), this file just
+// presents it to users as what it actually is: a real, unfakeable
+// waitlist signup count.
 const ABI = [
   "function upvote() external",
   "function totalUpvotes() view returns (uint256)",
@@ -15,16 +21,16 @@ async function loadCount() {
     const readProvider = new ethers.JsonRpcProvider("https://testnet-rpc.monad.xyz/");
     const contract = new ethers.Contract(deployment.address, ABI, readProvider);
     const count = await contract.totalUpvotes();
-    $("upvoteCount").textContent = `${count.toString()} vote${count.toString() === "1" ? "" : "s"} so far`;
+    $("waitlistCount").textContent = `${count.toString()} on the waitlist`;
   } catch (e) {
-    $("upvoteCount").textContent = "— votes so far";
+    $("waitlistCount").textContent = "— on the waitlist";
   }
 }
 
-async function castUpvote() {
-  const btn = $("upvoteBtn");
+async function joinWaitlist() {
+  const btn = $("waitlistBtn");
   if (!window.ethereum) {
-    alert("Install a wallet extension (MetaMask, Trust Wallet, etc.) to upvote on-chain.");
+    alert("Install a wallet extension (MetaMask, Trust Wallet, etc.) to join the waitlist on-chain.");
     return;
   }
   btn.disabled = true;
@@ -51,18 +57,18 @@ async function castUpvote() {
     const tx = await contract.upvote();
     await tx.wait();
 
-    btn.textContent = "Upvoted ✓";
+    btn.textContent = "You're on the list ✓";
     await loadCount();
   } catch (err) {
     if (String(err.reason || err.message || "").includes("AlreadyUpvoted")) {
-      btn.textContent = "Already upvoted ✓";
+      btn.textContent = "Already on the list ✓";
     } else {
       btn.textContent = originalText;
       btn.disabled = false;
-      alert("Upvote failed: " + (err.reason || err.shortMessage || err.message));
+      alert("Couldn't join the waitlist: " + (err.reason || err.shortMessage || err.message));
     }
   }
 }
 
-$("upvoteBtn").addEventListener("click", castUpvote);
+$("waitlistBtn").addEventListener("click", joinWaitlist);
 loadCount();
