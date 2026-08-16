@@ -113,16 +113,18 @@
 }
 
 .hero-stats {
-  display: flex;
-  gap: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
   margin-top: 24px;
-  padding: 20px;
-  background: var(--surface-2);
+  padding: 16px;
+  background: var(--surface);
   border-radius: 12px;
   border: 1px solid var(--border);
 }
 
 .hero-stat {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -298,10 +300,10 @@ code {
   position: sticky;
   top: 24px;
   align-self: start;
-  max-height: calc(100vh - 48px);
-  overflow-y: auto;
+  overflow-x: hidden;
   box-shadow: var(--shadow);
   z-index: 1;
+  min-width: 0;
 }
 .about-pane h1 {
   font-size: clamp(23px, 2.4vw, 28px);
