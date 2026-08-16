@@ -26,6 +26,47 @@ const EXPLORER = "https://testnet.monadvision.com/tx/";
 let provider, signer, poseidon, deployment;
 let committedRoot;
 
+/* ---- multi-wallet discovery (EIP-6963) ---------------------------------------- */
+
+const discoveredWallets = new Map();
+
+window.addEventListener("eip6963:announceProvider", (event) => {
+  discoveredWallets.set(event.detail.info.uuid, event.detail);
+});
+window.dispatchEvent(new Event("eip6963:requestProvider"));
+
+function pickWallet() {
+  return new Promise((resolve) => {
+    const wallets = [...discoveredWallets.values()];
+
+    if (wallets.length === 0) {
+      if (window.ethereum) return resolve(window.ethereum);
+      alert("No wallet found. Install MetaMask or another Ethereum wallet to run this demo.");
+      return resolve(null);
+    }
+    if (wallets.length === 1) return resolve(wallets[0].provider);
+
+    const overlay = $("walletPicker");
+    const list = $("walletList");
+    list.innerHTML = "";
+    for (const w of wallets) {
+      const btn = document.createElement("button");
+      btn.className = "wallet-option";
+      btn.innerHTML = `<img src="${w.info.icon}" alt="" /><span>${w.info.name}</span>`;
+      btn.addEventListener("click", () => {
+        overlay.hidden = true;
+        resolve(w.provider);
+      });
+      list.appendChild(btn);
+    }
+    overlay.hidden = false;
+    $("walletPickerCancel").onclick = () => {
+      overlay.hidden = true;
+      resolve(null);
+    };
+  });
+}
+
 /* ---- console log helpers ---------------------------------------- */
 
 function clearLog(el) {
@@ -77,19 +118,18 @@ async function loadDeployment() {
 }
 
 async function connect() {
-  if (!window.ethereum) {
-    alert("Install MetaMask to run this demo.");
-    return;
-  }
+  const chosen = await pickWallet();
+  if (!chosen) return;
+
   try {
-    await window.ethereum.request({
+    await chosen.request({
       method: "wallet_addEthereumChain",
       params: [MONAD_TESTNET],
     });
   } catch (e) {
     /* chain may already be added */
   }
-  provider = new ethers.BrowserProvider(window.ethereum);
+  provider = new ethers.BrowserProvider(chosen);
   await provider.send("eth_requestAccounts", []);
   signer = await provider.getSigner();
   const addr = await signer.getAddress();
