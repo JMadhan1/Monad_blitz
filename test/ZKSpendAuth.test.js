@@ -70,4 +70,20 @@ describe("ZKSpendAuth", function () {
     }
     expect(threw).to.equal(true);
   });
+
+  it("blocks all validation once the owner revokes the policy", async function () {
+    const revokedAgentId = 2n;
+    await identity.register(revokedAgentId, owner.address);
+    const revokedRoot = poseidon.F.toString(
+      poseidon([secretPolicyKey, maxLimit, ownerAddrUint.toString()])
+    );
+    await spendAuth.registerPolicy(revokedAgentId, revokedRoot);
+
+    await expect(spendAuth.revokePolicy(revokedAgentId))
+      .to.emit(spendAuth, "PolicyRevoked")
+      .withArgs(revokedAgentId);
+
+    await expect(spendAuth.validationRequest(revokedAgentId, 500))
+      .to.be.revertedWithCustomError(spendAuth, "PolicyIsRevoked");
+  });
 });

@@ -665,21 +665,129 @@ code {
 .foot-links { display: flex; align-items: center; gap: 16px; }
 
 @media (max-width: 860px) {
-  .app-shell { grid-template-columns: 1fr; margin: 20px auto 30px; padding: 0 16px; }
+  .app-shell { 
+    grid-template-columns: 1fr; 
+    margin: 20px auto 30px; 
+    padding: 0 16px; 
+    gap: 20px;
+  }
   .about-pane {
     position: static;
     max-height: none;
-    border-radius: 18px 18px 0 0;
+    border-radius: 18px;
     border-right: 1px solid var(--border);
-    border-bottom: none;
+    border-bottom: 1px solid var(--border);
+    padding: 24px 20px;
   }
-  .console-pane { border-radius: 0 0 18px 18px; }
-  .console-step:first-child { border-radius: 0; }
+  .console-pane { 
+    border-radius: 18px;
+  }
+  .console-step:first-child { border-radius: 18px 18px 0 0; }
   .console-step:last-child { border-radius: 0 0 18px 18px; }
+  
+  .hero-stats {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  
+  .hero-stat {
+    flex: 1 1 calc(50% - 8px);
+    min-width: 120px;
+  }
 }
+
 @media (max-width: 520px) {
-  .console-step { padding: 22px 18px; }
-  .console-divider { margin: 0 18px; }
-  .console-step-body { padding-left: 0; }
-  .about-pane { padding: 26px 20px; }
+  .app-shell {
+    margin: 16px auto 24px;
+    padding: 0 12px;
+  }
+  
+  .about-pane {
+    padding: 20px 16px;
+    border-radius: 14px;
+  }
+  
+  .console-pane {
+    border-radius: 14px;
+  }
+  
+  .console-step { 
+    padding: 20px 16px; 
+  }
+  
+  .console-step:first-child { border-radius: 14px 14px 0 0; }
+  .console-step:last-child { border-radius: 0 0 14px 14px; }
+  
+  .console-divider { margin: 0 16px; }
+  
+  .console-step-body { 
+    padding-left: 0; 
+  }
+  
+  .topbar {
+    padding: 14px 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .topbar-links {
+    gap: 16px;
+  }
+  
+  .topbar-links a:not(.topbar-gh) {
+    font-size: 12px;
+  }
+  
+  .net-chip {
+    font-size: 11px;
+    padding: 5px 10px 5px 8px;
+  }
+  
+  .hero-section h1 {
+    font-size: 24px;
+  }
+  
+  .hero-sub {
+    font-size: 13px;
+  }
+  
+  .problem-box, .solution-box {
+    padding: 14px;
+  }
+  
+  .hero-stats {
+    gap: 12px;
+    padding: 16px;
+  }
+  
+  .hero-stat {
+    flex: 1 1 100%;
+    min-width: unset;
+  }
+  
+  .stage-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .btn {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .agent-stats {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .stat-item {
+    flex: 1 1 calc(50% - 6px);
+  }
+  
+  .foot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 11px;
+  }
 }

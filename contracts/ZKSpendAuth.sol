@@ -22,6 +22,11 @@ interface IIdentityRegistryMinimal {
 contract ZKSpendAuth {
     enum Status { None, Pending, Passed, Failed }
 
+    struct Policy {
+        uint256 committedRoot; // Poseidon(secretKey, maxLimit, owner)
+        bool revoked;
+    }
+
     struct ValidationRequest {
         uint256 agentId;
         uint256 requestedAmount;
@@ -32,15 +37,17 @@ contract ZKSpendAuth {
     IGroth16Verifier public immutable verifier;
     IIdentityRegistryMinimal public immutable identityRegistry;
 
-    mapping(uint256 => uint256) public policyCommitment; // agentId => Poseidon(secretKey, maxLimit, owner)
+    mapping(uint256 => Policy) public policies;
     mapping(bytes32 => ValidationRequest) public requests;
 
     event PolicyRegistered(uint256 indexed agentId, uint256 committedRoot);
+    event PolicyRevoked(uint256 indexed agentId);
     event ValidationRequested(bytes32 indexed requestHash, uint256 indexed agentId, uint256 requestedAmount);
     event ValidationResponded(bytes32 indexed requestHash, uint256 indexed agentId, Status status);
 
     error NotAgentOwner();
     error NoPolicyCommitted();
+    error PolicyIsRevoked();
     error RequestNotFound();
     error RequestAlreadyResolved();
     error InvalidProof();
@@ -52,12 +59,23 @@ contract ZKSpendAuth {
 
     function registerPolicy(uint256 agentId, uint256 committedRoot) external {
         if (identityRegistry.ownerOf(agentId) != msg.sender) revert NotAgentOwner();
-        policyCommitment[agentId] = committedRoot;
+        policies[agentId] = Policy({ committedRoot: committedRoot, revoked: false });
         emit PolicyRegistered(agentId, committedRoot);
     }
 
+    /// @notice Immediately kill an agent's ability to pass validation - e.g.
+    /// after a suspected secretPolicyKey leak. No proof can satisfy a
+    /// revoked policy, regardless of what secret an attacker holds.
+    function revokePolicy(uint256 agentId) external {
+        if (identityRegistry.ownerOf(agentId) != msg.sender) revert NotAgentOwner();
+        policies[agentId].revoked = true;
+        emit PolicyRevoked(agentId);
+    }
+
     function validationRequest(uint256 agentId, uint256 requestedAmount) external returns (bytes32 requestHash) {
-        if (policyCommitment[agentId] == 0) revert NoPolicyCommitted();
+        Policy storage policy = policies[agentId];
+        if (policy.committedRoot == 0) revert NoPolicyCommitted();
+        if (policy.revoked) revert PolicyIsRevoked();
 
         requestHash = keccak256(abi.encodePacked(agentId, requestedAmount, block.timestamp, block.prevrandao));
         requests[requestHash] = ValidationRequest({
@@ -80,9 +98,11 @@ contract ZKSpendAuth {
         if (req.requestedAt == 0) revert RequestNotFound();
         if (req.status != Status.Pending) revert RequestAlreadyResolved();
 
-        uint256 committedRoot = policyCommitment[req.agentId];
+        Policy storage policy = policies[req.agentId];
+        if (policy.revoked) revert PolicyIsRevoked();
+
         uint256 ownerAddr = uint256(uint160(identityRegistry.ownerOf(req.agentId)));
-        uint[3] memory publicSignals = [committedRoot, req.requestedAmount, ownerAddr];
+        uint[3] memory publicSignals = [policy.committedRoot, req.requestedAmount, ownerAddr];
 
         bool ok = verifier.verifyProof(pA, pB, pC, publicSignals);
         if (!ok) revert InvalidProof();
@@ -93,5 +113,9 @@ contract ZKSpendAuth {
 
     function getValidationStatus(bytes32 requestHash) external view returns (Status) {
         return requests[requestHash].status;
+    }
+
+    function getPolicy(uint256 agentId) external view returns (Policy memory) {
+        return policies[agentId];
     }
 }

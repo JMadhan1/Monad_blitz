@@ -7,7 +7,7 @@
 <br/>
 
 [![Monad Testnet](https://img.shields.io/badge/Monad-Testnet_10143-836EF9?style=for-the-badge&logoColor=white)](https://testnet.monadexplorer.com/)
-[![Verified](https://img.shields.io/badge/Contracts-✓_Full_Match_Verified-00C853?style=for-the-badge)](https://testnet.monadvision.com/contracts/full_match/10143/0x165825Bd33c87c8aE31d60211dE9EE93e8039adE/)
+[![Verified](https://img.shields.io/badge/Contracts-✓_Full_Match_Verified-00C853?style=for-the-badge)](https://testnet.monadvision.com/contracts/full_match/10143/0x0693184386bfC020ed22DFD2546cD8ECc3757d9F/)
 [![Groth16](https://img.shields.io/badge/Proof-Groth16_·_BN254-FF6B35?style=for-the-badge)](circuits/spend_auth.circom)
 [![Live](https://img.shields.io/badge/Status-Live_On--Chain-success?style=for-the-badge)](#-live-deployment)
 
@@ -206,7 +206,7 @@ Connect MetaMask with a little [testnet MON 🚰](https://faucet.monad.xyz) *(Me
 
 | Contract | Address | Source |
 |:--|:--|:--:|
-| 🛡️ **ZKSpendAuth** *(main registry)* | `0x165825Bd33c87c8aE31d60211dE9EE93e8039adE` | [![Verified](https://img.shields.io/badge/✓_verified-00C853?style=flat-square)](https://testnet.monadvision.com/contracts/full_match/10143/0x165825Bd33c87c8aE31d60211dE9EE93e8039adE/) |
+| 🛡️ **ZKSpendAuth** *(main registry)* | `0x0693184386bfC020ed22DFD2546cD8ECc3757d9F` | [![Verified](https://img.shields.io/badge/✓_verified-00C853?style=flat-square)](https://testnet.monadvision.com/contracts/full_match/10143/0x0693184386bfC020ed22DFD2546cD8ECc3757d9F/) |
 | 🧮 **Groth16Verifier** | `0x4dE6AF7329E88F08C0560DAf1290a0DF152901E3` | [![Verified](https://img.shields.io/badge/✓_verified-00C853?style=flat-square)](https://testnet.monadvision.com/contracts/full_match/10143/0x4dE6AF7329E88F08C0560DAf1290a0DF152901E3/) |
 | 🆔 **MockIdentityRegistry** | `0x2274D05C24527D0e4b689b215ddEAfE51B319008` | [![Verified](https://img.shields.io/badge/✓_verified-00C853?style=flat-square)](https://testnet.monadvision.com/contracts/full_match/10143/0x2274D05C24527D0e4b689b215ddEAfE51B319008/) |
 
@@ -314,16 +314,16 @@ ZK is the only option that is **simultaneously**: no trusted party · no reveal 
 ```
 ├── circuits/spend_auth.circom          🧩 the entire trust model, ~30 lines
 ├── contracts/
-│   ├── ZKSpendAuth.sol                 🛡️ registerPolicy · validationRequest · validationResponse
+│   ├── ZKSpendAuth.sol                 🛡️ registerPolicy · revokePolicy · validationRequest · validationResponse
 │   ├── Groth16Verifier.sol             🧮 snarkjs-generated, BN254 precompiles
 │   └── mocks/MockIdentityRegistry.sol  🆔 ERC-8004 Identity Registry stand-in
 ├── public/                             🎨 static frontend — proofs generated in YOUR browser
-├── vercel.json                         ▲ zero-build static deploy config
-└── test/ZKSpendAuth.test.js            ✅ valid spend passes · over-limit can't produce a witness
+│   └── vercel.json                     ▲ zero-build static deploy config (deploy root is public/)
+└── test/ZKSpendAuth.test.js            ✅ valid spend passes · over-limit can't produce a witness · revocation blocks validation
 ```
 
 ```bash
-npx hardhat test   # 2 passing
+npx hardhat test   # 3 passing
 ```
 
 <br/>
@@ -339,7 +339,6 @@ Built in a single-day hackathon window. These are the corners **knowingly** cut 
 | 🔁 **Per-transaction cap, not a running budget** | no cumulative spend tracking — an agent can spend `500` repeatedly | commit a running total; prove `spent + amount ≤ limit` and commit the new `spent` |
 | 1️⃣ One flat limit per agent | no per-recipient or time-windowed budgets | a Merkle-root policy instead of a single hash |
 | 🎪 Single-contributor trusted setup | time-boxed for today's window | multi-party ceremony, or a setup-free system (Plonk/Halo2) before real money |
-| 🔓 No `revokePolicy()` | can't invalidate a committed policy if the key leaks | add revocation + policy versioning |
 | ⏱️ In-browser proving (~1–2s) | fine for a demo, too slow at high agent throughput | server-side or cached proving |
 | 🆔 `MockIdentityRegistry` stands in | no real ERC-8004 Identity Registry on testnet yet | swap in the real one once it ships |
 
@@ -352,7 +351,7 @@ Built in a single-day hackathon window. These are the corners **knowingly** cut 
 
 ## ▲ Deploying the frontend
 
-The frontend is fully static — [`vercel.json`](vercel.json) pins a zero-build deploy that skips the Hardhat/circom toolchain entirely and ships `public/` as-is.
+The frontend is fully static — [`public/vercel.json`](public/vercel.json) pins a zero-build deploy that skips the Hardhat/circom toolchain entirely and ships `public/` as-is.
 
 ```bash
 npm install -g vercel
