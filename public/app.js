@@ -1,4 +1,10 @@
 import { buildPoseidon } from "https://cdn.jsdelivr.net/npm/circomlibjs@0.1.7/+esm";
+import { EthereumProvider } from "https://esm.sh/@walletconnect/ethereum-provider@2";
+
+// Get a free project ID at https://dashboard.reown.com — required for the
+// mobile "scan to connect" wallet option. Browser-extension wallets
+// (MetaMask, Trust Wallet, etc.) work without this.
+const REOWN_PROJECT_ID = "REPLACE_WITH_YOUR_REOWN_PROJECT_ID";
 
 const MONAD_TESTNET = {
   chainId: "0x279f", // 10143
@@ -35,21 +41,40 @@ window.addEventListener("eip6963:announceProvider", (event) => {
 });
 window.dispatchEvent(new Event("eip6963:requestProvider"));
 
+let wcProvider = null;
+
+async function connectWalletConnect() {
+  if (REOWN_PROJECT_ID === "REPLACE_WITH_YOUR_REOWN_PROJECT_ID") {
+    alert("Mobile wallet connect isn't configured yet — get a free project ID at dashboard.reown.com and add it to app.js.");
+    return null;
+  }
+  if (!wcProvider) {
+    wcProvider = await EthereumProvider.init({
+      projectId: REOWN_PROJECT_ID,
+      chains: [10143],
+      optionalChains: [10143],
+      rpcMap: { 10143: "https://testnet-rpc.monad.xyz/" },
+      showQrModal: true,
+      metadata: {
+        name: "Blind Cap",
+        description: "Prove you can afford it. Reveal nothing.",
+        url: window.location.origin,
+        icons: [],
+      },
+    });
+  }
+  await wcProvider.connect();
+  return wcProvider;
+}
+
 function pickWallet() {
   return new Promise((resolve) => {
-    const wallets = [...discoveredWallets.values()];
-
-    if (wallets.length === 0) {
-      if (window.ethereum) return resolve(window.ethereum);
-      alert("No wallet found. Install MetaMask or another Ethereum wallet to run this demo.");
-      return resolve(null);
-    }
-    if (wallets.length === 1) return resolve(wallets[0].provider);
-
+    const browserWallets = [...discoveredWallets.values()];
     const overlay = $("walletPicker");
     const list = $("walletList");
     list.innerHTML = "";
-    for (const w of wallets) {
+
+    for (const w of browserWallets) {
       const btn = document.createElement("button");
       btn.className = "wallet-option";
       btn.innerHTML = `<img src="${w.info.icon}" alt="" /><span>${w.info.name}</span>`;
@@ -59,6 +84,30 @@ function pickWallet() {
       });
       list.appendChild(btn);
     }
+
+    // Legacy fallback: a wallet that injects window.ethereum but doesn't
+    // announce itself via EIP-6963 yet.
+    if (browserWallets.length === 0 && window.ethereum) {
+      const btn = document.createElement("button");
+      btn.className = "wallet-option";
+      btn.innerHTML = `<span class="wallet-option-icon">◆</span><span>Browser Wallet</span>`;
+      btn.addEventListener("click", () => {
+        overlay.hidden = true;
+        resolve(window.ethereum);
+      });
+      list.appendChild(btn);
+    }
+
+    const wcBtn = document.createElement("button");
+    wcBtn.className = "wallet-option";
+    wcBtn.innerHTML = `<span class="wallet-option-icon">📱</span><span>Mobile Wallet — scan with WalletConnect</span>`;
+    wcBtn.addEventListener("click", async () => {
+      overlay.hidden = true;
+      const p = await connectWalletConnect();
+      resolve(p);
+    });
+    list.appendChild(wcBtn);
+
     overlay.hidden = false;
     $("walletPickerCancel").onclick = () => {
       overlay.hidden = true;
