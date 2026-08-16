@@ -1,9 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": null,
-  "outputDirectory": "public",
-  "installCommand": "echo 'Static site - skipping Hardhat/circom toolchain install'",
-  "buildCommand": "echo 'No build step - public/ is shipped as-is'",
   "cleanUrls": true,
   "headers": [
     {
