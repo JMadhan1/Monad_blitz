@@ -1,6 +1,6 @@
 import { buildPoseidon } from "https://cdn.jsdelivr.net/npm/circomlibjs@0.1.7/+esm";
 import { EthereumProvider } from "https://esm.sh/@walletconnect/ethereum-provider@2";
-import BlindCapAgent from "../agent/simple-agent.js";
+import BlindCapAgent from "./agent/simple-agent.js";
 
 // Get a free project ID at https://dashboard.reown.com — required for the
 // mobile "scan to connect" wallet option. Browser-extension wallets

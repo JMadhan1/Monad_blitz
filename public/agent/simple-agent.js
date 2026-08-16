@@ -144,7 +144,4 @@ class BlindCapAgent {
   }
 }
 
-// Export for use in frontend
-if (typeof window !== 'undefined') {
-  window.BlindCapAgent = BlindCapAgent;
-}
+export default BlindCapAgent;
